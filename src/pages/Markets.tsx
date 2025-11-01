@@ -10,31 +10,18 @@ import {
 } from '@/components/ui/select';
 import { Search, Flame, Sparkles } from 'lucide-react';
 import MarketCard from '@/components/markets/MarketCard';
-import { mockMarkets } from '@/lib/mockData';
+import { useQuery } from '@tanstack/react-query';
+import { api } from '@/lib/api';
 
 const Markets = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [sortBy, setSortBy] = useState('liquidity');
 
-  const filteredMarkets = mockMarkets
-    .filter(market => {
-      const matchesSearch = market.question.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesStatus = statusFilter === 'all' || market.status === statusFilter;
-      return matchesSearch && matchesStatus;
-    })
-    .sort((a, b) => {
-      switch (sortBy) {
-        case 'liquidity':
-          return b.liquidity - a.liquidity;
-        case 'volume':
-          return b.volume - a.volume;
-        case 'newest':
-          return b.endDate.getTime() - a.endDate.getTime();
-        default:
-          return 0;
-      }
-    });
+  const { data: markets, isLoading } = useQuery({
+    queryKey: ['markets', statusFilter, searchQuery, sortBy],
+    queryFn: () => api.markets.list({ status: statusFilter, search: searchQuery, sort: sortBy }),
+  });
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -82,13 +69,15 @@ const Markets = () => {
         </Select>
       </div>
 
-      {filteredMarkets.length === 0 ? (
+      {isLoading ? (
+        <div className="py-16 text-center text-muted-foreground">Loading markets…</div>
+      ) : !markets || markets.length === 0 ? (
         <div className="py-16 text-center">
           <p className="text-muted-foreground">No markets found matching your criteria.</p>
         </div>
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {filteredMarkets.map((market) => (
+          {markets.map((market: any) => (
             <MarketCard key={market.id} market={market} />
           ))}
         </div>

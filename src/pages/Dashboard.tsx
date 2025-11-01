@@ -3,12 +3,18 @@ import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { BarChart3, ShoppingBag, PlusCircle, Wallet, Sparkles } from 'lucide-react';
 import MarketCard from '@/components/markets/MarketCard';
-import { mockMarkets, mockUserPositions, formatCurrency } from '@/lib/mockData';
+import { formatCurrency } from '@/lib/mockData';
+import { useQuery } from '@tanstack/react-query';
+import { api } from '@/lib/api';
+import { useWallet } from '@/lib/wallet';
 
 const Dashboard = () => {
-  const featured = mockMarkets.filter(m => m.status === 'open').slice(0, 3);
-  const invested = mockUserPositions.reduce((s, p) => s + p.totalInvested, 0);
-  const current = mockUserPositions.reduce((s, p) => s + p.currentValue, 0);
+  const { walletAddress } = useWallet();
+  const { data: markets } = useQuery({ queryKey: ['markets', 'open', '', 'liquidity'], queryFn: () => api.markets.list({ status: 'open', sort: 'liquidity' }) });
+  const featured = (markets || []).slice(0, 3);
+  const { data: positions } = useQuery({ queryKey: ['portfolio', walletAddress], queryFn: () => api.portfolio.byWallet(walletAddress!), enabled: !!walletAddress });
+  const invested = (positions || []).reduce((s: number, p: any) => s + p.totalInvested, 0);
+  const current = (positions || []).reduce((s: number, p: any) => s + p.currentValue, 0);
   const pnl = current - invested;
 
   return (
@@ -48,7 +54,7 @@ const Dashboard = () => {
         </Card>
         <Card className="p-6 shadow-card">
           <div className="text-sm text-muted-foreground mb-1">Active Positions</div>
-          <div className="text-2xl font-bold">{mockUserPositions.filter(p=>!p.canRedeem).length}</div>
+          <div className="text-2xl font-bold">{(positions || []).filter((p: any)=>!p.canRedeem).length}</div>
         </Card>
       </div>
 
@@ -75,7 +81,7 @@ const Dashboard = () => {
         <Link to="/markets"><Button variant="ghost">See all</Button></Link>
       </div>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {featured.map(m => (
+        {featured.map((m: any) => (
           <MarketCard key={m.id} market={m} />
         ))}
       </div>

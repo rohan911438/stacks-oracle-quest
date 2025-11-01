@@ -1,14 +1,10 @@
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Clock, TrendingUp } from 'lucide-react';
-import { Market, formatCurrency, calculateTimeRemaining, formatPrice } from '@/lib/mockData';
+import { formatCurrency, calculateTimeRemaining, formatPrice } from '@/lib/mockData';
 import { Link } from 'react-router-dom';
 
-interface MarketCardProps {
-  market: Market;
-}
-
-const MarketCard = ({ market }: MarketCardProps) => {
+const MarketCard = ({ market }: { market: any }) => {
   const statusBadge = market.status === 'resolved' 
     ? <Badge variant={market.resolvedOutcome === 'yes' ? 'default' : 'destructive'} className="animate-scale-in">
         {market.resolvedOutcome === 'yes' ? '✓ YES Won' : '✗ NO Won'}
@@ -60,7 +56,7 @@ const MarketCard = ({ market }: MarketCardProps) => {
               </div>
               <div className="flex items-center gap-1.5 text-muted-foreground">
                 <Clock className="h-4 w-4 text-primary" />
-                <span className="font-medium">{calculateTimeRemaining(market.endDate)}</span>
+                <span className="font-medium">{calculateTimeRemaining(new Date(market.endDate))}</span>
               </div>
             </div>
             <div className="mt-2 text-xs text-muted-foreground">

@@ -11,6 +11,9 @@ import { CalendarIcon, TrendingUp, DollarSign, User, AlertCircle, CheckCircle2 }
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { useMutation } from '@tanstack/react-query';
+import { api } from '@/lib/api';
+import { useNavigate } from 'react-router-dom';
 
 const CreateMarket = () => {
   const [question, setQuestion] = useState('');
@@ -20,9 +23,29 @@ const CreateMarket = () => {
   const [liquidity, setLiquidity] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const navigate = useNavigate();
+
+  const createMutation = useMutation({
+    mutationFn: () => api.markets.create({
+      question,
+      category,
+      endDate,
+      oracle,
+      liquidity: parseFloat(liquidity),
+    }),
+    onSuccess: (created: any) => {
+      toast.success('Market created successfully!', {
+        description: `Question: ${question.substring(0, 50)}...`,
+      });
+      navigate(`/market/${created.id}`);
+    },
+    onError: (e: any) => toast.error(e?.message || 'Create failed'),
+    onSettled: () => setIsSubmitting(false),
+  });
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Validation
     if (!question.trim()) {
       toast.error('Please enter a market question');
@@ -50,21 +73,7 @@ const CreateMarket = () => {
     }
 
     setIsSubmitting(true);
-    
-    // Simulate market creation
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    toast.success('Market created successfully!', {
-      description: `Question: ${question.substring(0, 50)}...`
-    });
-    
-    // Reset form
-    setQuestion('');
-    setCategory('');
-    setEndDate(undefined);
-    setOracle('');
-    setLiquidity('');
-    setIsSubmitting(false);
+    createMutation.mutate();
   };
 
   const isFormValid = question && category && endDate && oracle && liquidity;

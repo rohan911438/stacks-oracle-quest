@@ -1,14 +1,19 @@
 import { Button } from '@/components/ui/button';
 import { ArrowRight, TrendingUp, Lock, Zap, ShieldCheck, Clock, Coins } from 'lucide-react';
 import MarketCard from '@/components/markets/MarketCard';
-import { mockMarkets } from '@/lib/mockData';
+import { useQuery } from '@tanstack/react-query';
+import { api } from '@/lib/api';
 
 interface LandingProps {
   onConnectWallet: () => void;
 }
 
 const Landing = ({ onConnectWallet }: LandingProps) => {
-  const featuredMarkets = mockMarkets.filter(m => m.status === 'open').slice(0, 3);
+  const { data: markets } = useQuery({
+    queryKey: ['landing', 'featured'],
+    queryFn: () => api.markets.list({ status: 'open', sort: 'liquidity' }),
+  });
+  const featuredMarkets = (markets || []).slice(0, 3);
 
   return (
     <div className="min-h-screen">
@@ -78,7 +83,7 @@ const Landing = ({ onConnectWallet }: LandingProps) => {
             <p className="text-muted-foreground text-lg">Trending prediction markets with high volume</p>
           </div>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {featuredMarkets.map((market, index) => (
+            {featuredMarkets.map((market: any, index: number) => (
               <div key={market.id} style={{ animationDelay: `${index * 0.1}s` }}>
                 <MarketCard market={market} />
               </div>

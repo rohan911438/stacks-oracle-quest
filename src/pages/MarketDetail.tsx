@@ -5,14 +5,29 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Clock, TrendingUp, User, BarChart3, Users, DollarSign, Info } from 'lucide-react';
-import { mockMarkets, formatCurrency, calculateTimeRemaining, formatPrice } from '@/lib/mockData';
+import { formatCurrency, calculateTimeRemaining, formatPrice } from '@/lib/mockData';
 import { toast } from 'sonner';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { api } from '@/lib/api';
+import { useWallet } from '@/lib/wallet';
 
 const MarketDetail = () => {
   const { id } = useParams();
-  const market = mockMarkets.find(m => m.id === id);
+  const { walletAddress } = useWallet();
+  const queryClient = useQueryClient();
+  const { data: market, isLoading } = useQuery({
+    queryKey: ['market', id],
+    queryFn: () => api.markets.get(id as string),
+    enabled: !!id,
+  });
   const [yesAmount, setYesAmount] = useState('');
   const [noAmount, setNoAmount] = useState('');
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto px-4 py-16 text-center text-muted-foreground">Loading market…</div>
+    );
+  }
 
   if (!market) {
     return (
@@ -25,18 +40,39 @@ const MarketDetail = () => {
     );
   }
 
+  const tradeMutation = useMutation({
+    mutationFn: (vars: { outcome: 'yes' | 'no'; amount: string }) =>
+      api.trades.place({ walletAddress: walletAddress!, marketId: market.id, outcome: vars.outcome, amount: parseFloat(vars.amount) }),
+    onSuccess: () => {
+      toast.success('Trade placed successfully');
+      queryClient.invalidateQueries({ queryKey: ['market', id] });
+      if (yesAmount) setYesAmount('');
+      if (noAmount) setNoAmount('');
+    },
+    onError: (e: any) => toast.error(e?.message || 'Trade failed'),
+  });
+
   const handleTrade = (outcome: 'yes' | 'no', amount: string) => {
     if (!amount || parseFloat(amount) <= 0) {
       toast.error('Please enter a valid amount');
       return;
     }
-    toast.success(`Trade placed: ${amount} STX on ${outcome.toUpperCase()}`);
-    if (outcome === 'yes') setYesAmount('');
-    else setNoAmount('');
+    if (!walletAddress) {
+      toast.error('Connect wallet first');
+      return;
+    }
+    tradeMutation.mutate({ outcome, amount });
   };
 
+  const redeemMutation = useMutation({
+    mutationFn: () => api.redeem({ walletAddress: walletAddress!, marketId: market.id }),
+    onSuccess: () => toast.success('Winnings redeemed successfully!'),
+    onError: (e: any) => toast.error(e?.message || 'Redeem failed'),
+  });
+
   const handleRedeem = () => {
-    toast.success('Winnings redeemed successfully!');
+    if (!walletAddress) return toast.error('Connect wallet first');
+    redeemMutation.mutate();
   };
 
   const isResolved = market.status === 'resolved';
@@ -91,7 +127,7 @@ const MarketDetail = () => {
                   <Clock className="h-4 w-4 text-primary" />
                   <span>Time Left</span>
                 </div>
-                <div className="text-xl font-bold">{calculateTimeRemaining(market.endDate)}</div>
+                <div className="text-xl font-bold">{calculateTimeRemaining(new Date(market.endDate))}</div>
               </div>
               
               <div className="rounded-lg bg-gradient-card p-4 border border-border">

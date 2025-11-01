@@ -5,26 +5,34 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Link } from 'react-router-dom';
 import { TrendingUp, TrendingDown, Wallet, DollarSign, BarChart3, Trophy } from 'lucide-react';
-import { mockUserPositions, formatCurrency, calculateTimeRemaining } from '@/lib/mockData';
+import { formatCurrency } from '@/lib/mockData';
 import { toast } from 'sonner';
+import { useQuery } from '@tanstack/react-query';
+import { api } from '@/lib/api';
+import { useWallet } from '@/lib/wallet';
 
 const Portfolio = () => {
   const [activeTab, setActiveTab] = useState('all');
+  const { walletAddress } = useWallet();
+  const { data: positions, isLoading } = useQuery({
+    queryKey: ['portfolio', walletAddress],
+    queryFn: () => api.portfolio.byWallet(walletAddress!),
+    enabled: !!walletAddress,
+  });
 
-  const totalInvested = mockUserPositions.reduce((sum, p) => sum + p.totalInvested, 0);
-  const totalCurrentValue = mockUserPositions.reduce((sum, p) => sum + p.currentValue, 0);
+  const totalInvested = (positions || []).reduce((sum: number, p: any) => sum + p.totalInvested, 0);
+  const totalCurrentValue = (positions || []).reduce((sum: number, p: any) => sum + p.currentValue, 0);
   const totalPnL = totalCurrentValue - totalInvested;
   const pnlPercentage = totalInvested > 0 ? ((totalPnL / totalInvested) * 100) : 0;
-
-  const activePositions = mockUserPositions.filter(p => !p.canRedeem);
-  const redeemablePositions = mockUserPositions.filter(p => p.canRedeem);
+  const activePositions = (positions || []).filter((p: any) => !p.canRedeem);
+  const redeemablePositions = (positions || []).filter((p: any) => p.canRedeem);
 
   const handleRedeem = (marketId: string) => {
     toast.success('Winnings redeemed successfully!');
   };
 
   const displayPositions = activeTab === 'all' 
-    ? mockUserPositions 
+    ? (positions || []) 
     : activeTab === 'active' 
     ? activePositions 
     : redeemablePositions;
@@ -112,7 +120,9 @@ const Portfolio = () => {
           </div>
 
           <TabsContent value={activeTab} className="mt-0">
-            {displayPositions.length === 0 ? (
+            {isLoading ? (
+              <div className="py-16 text-center text-muted-foreground">Loading positions…</div>
+            ) : displayPositions.length === 0 ? (
               <div className="py-16 text-center">
                 <BarChart3 className="h-16 w-16 mx-auto mb-4 text-muted-foreground/50" />
                 <p className="text-muted-foreground mb-4">
