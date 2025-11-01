@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { ArrowRight, TrendingUp, Lock, Zap } from 'lucide-react';
+import { ArrowRight, TrendingUp, Lock, Zap, ShieldCheck, Clock, Coins } from 'lucide-react';
 import MarketCard from '@/components/markets/MarketCard';
 import { mockMarkets } from '@/lib/mockData';
 
@@ -83,6 +83,76 @@ const Landing = ({ onConnectWallet }: LandingProps) => {
                 <MarketCard market={market} />
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* How it works */}
+      <section className="py-16">
+        <div className="container mx-auto px-4">
+          <div className="mb-10 text-center">
+            <h2 className="text-3xl md:text-4xl font-bold mb-2">How OracleQuest works</h2>
+            <p className="text-muted-foreground">Three simple steps to start trading on truth</p>
+          </div>
+          <div className="grid gap-6 md:grid-cols-3">
+            <div className="rounded-xl border bg-card p-6 shadow-card animate-fade-in">
+              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-primary text-white">1</div>
+              <h3 className="mb-2 text-xl font-semibold">Connect your wallet</h3>
+              <p className="text-muted-foreground">Use Leather or Xverse to connect securely on Stacks, secured by Bitcoin.</p>
+            </div>
+            <div className="rounded-xl border bg-card p-6 shadow-card animate-fade-in" style={{ animationDelay: '0.1s' }}>
+              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-primary text-white">2</div>
+              <h3 className="mb-2 text-xl font-semibold">Pick a market</h3>
+              <p className="text-muted-foreground">Browse trending markets or create your own with an on-chain oracle.</p>
+            </div>
+            <div className="rounded-xl border bg-card p-6 shadow-card animate-fade-in" style={{ animationDelay: '0.2s' }}>
+              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-primary text-white">3</div>
+              <h3 className="mb-2 text-xl font-semibold">Trade YES/NO shares</h3>
+              <p className="text-muted-foreground">Buy or sell shares instantly. Redeem when the market resolves.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Trust and metrics */}
+      <section className="py-16 bg-gradient-card">
+        <div className="container mx-auto px-4">
+          <div className="grid gap-6 md:grid-cols-3">
+            <div className="rounded-xl border bg-card p-6 shadow-card flex items-center gap-3">
+              <ShieldCheck className="h-10 w-10 text-primary" />
+              <div>
+                <div className="text-2xl font-bold">Bitcoin security</div>
+                <div className="text-sm text-muted-foreground">Powered by Stacks L2</div>
+              </div>
+            </div>
+            <div className="rounded-xl border bg-card p-6 shadow-card flex items-center gap-3">
+              <Clock className="h-10 w-10 text-primary" />
+              <div>
+                <div className="text-2xl font-bold">Instant trading</div>
+                <div className="text-sm text-muted-foreground">Low fees, fast settlement</div>
+              </div>
+            </div>
+            <div className="rounded-xl border bg-card p-6 shadow-card flex items-center gap-3">
+              <Coins className="h-10 w-10 text-primary" />
+              <div>
+                <div className="text-2xl font-bold">Deep liquidity</div>
+                <div className="text-sm text-muted-foreground">AMM-powered pricing</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="py-20">
+        <div className="container mx-auto px-4">
+          <div className="rounded-2xl border bg-gradient-card p-8 md:p-12 text-center shadow-glow">
+            <h3 className="text-2xl md:text-3xl font-bold mb-3">Ready to predict the future?</h3>
+            <p className="text-muted-foreground mb-6">Connect your wallet to start trading markets on OracleQuest.</p>
+            <Button onClick={onConnectWallet} size="lg" className="gap-2 shadow-glow">
+              Connect Wallet
+              <ArrowRight className="h-5 w-5" />
+            </Button>
           </div>
         </div>
       </section>

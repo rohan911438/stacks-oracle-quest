@@ -2,18 +2,19 @@ import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { TrendingUp, Wallet } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useWallet } from '@/lib/wallet';
 
 interface NavbarProps {
-  isConnected: boolean;
-  walletAddress?: string;
   onConnectWallet: () => void;
 }
 
-const Navbar = ({ isConnected, walletAddress, onConnectWallet }: NavbarProps) => {
+const Navbar = ({ onConnectWallet }: NavbarProps) => {
+  const { isConnected, walletAddress } = useWallet();
   const location = useLocation();
 
   const navItems = [
     { label: 'Home', path: '/' },
+    { label: 'Dashboard', path: '/dashboard', requiresWallet: true },
     { label: 'Markets', path: '/markets', requiresWallet: true },
     { label: 'Portfolio', path: '/portfolio', requiresWallet: true },
     { label: 'Create Market', path: '/create', requiresWallet: true },
@@ -31,7 +32,7 @@ const Navbar = ({ isConnected, walletAddress, onConnectWallet }: NavbarProps) =>
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-primary">
               <TrendingUp className="h-6 w-6 text-white" />
             </div>
-            <span className="text-xl font-bold">PredictStack</span>
+            <span className="text-xl font-bold">OracleQuest</span>
           </Link>
 
           <div className="hidden items-center gap-1 md:flex">

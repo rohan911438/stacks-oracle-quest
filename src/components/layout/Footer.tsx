@@ -6,7 +6,7 @@ const Footer = () => {
       <div className="container mx-auto px-4">
         <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
           <div className="text-sm text-muted-foreground">
-            © 2025 PredictStack. Decentralized prediction markets on Stacks.
+            © 2025 OracleQuest. Decentralized prediction markets on Stacks.
           </div>
           <div className="flex items-center gap-4">
             <a
