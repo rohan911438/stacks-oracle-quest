@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Search } from 'lucide-react';
+import { Search, Flame, Sparkles } from 'lucide-react';
 import MarketCard from '@/components/markets/MarketCard';
 import { mockMarkets } from '@/lib/mockData';
 
@@ -38,9 +38,15 @@ const Markets = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="mb-2 text-4xl font-bold">Markets</h1>
-        <p className="text-muted-foreground">Browse and trade on prediction markets</p>
+      <div className="mb-8 flex items-start justify-between gap-4">
+        <div>
+          <h1 className="mb-2 text-4xl font-bold">Markets</h1>
+          <p className="text-muted-foreground">Browse and trade on prediction markets</p>
+        </div>
+        <div className="hidden md:flex items-center gap-3">
+          <div className="flex items-center gap-2 rounded-full border bg-card px-3 py-1.5 text-xs shadow-card"><Sparkles className="h-3.5 w-3.5 text-primary"/> New</div>
+          <div className="flex items-center gap-2 rounded-full border bg-card px-3 py-1.5 text-xs shadow-card"><Flame className="h-3.5 w-3.5 text-primary"/> Trending</div>
+        </div>
       </div>
 
       <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center">
