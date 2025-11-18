@@ -27,11 +27,17 @@ const Shell = () => {
 
   const handleConnectWallet = () => setShowWalletDialog(true);
 
-  const handleWalletConnect = (wallet: 'leather' | 'xverse') => {
-    connect(wallet);
+  const handleWalletConnect = async (wallet: 'leather' | 'xverse') => {
+    const ok = await connect(wallet);
     setShowWalletDialog(false);
-    toast.success(`Connected with ${wallet === 'leather' ? 'Leather' : 'Xverse'} Wallet`);
-    navigate('/dashboard');
+    if (ok) {
+      toast.success(`Connected with ${wallet === 'leather' ? 'Leather' : 'Xverse'} Wallet`);
+      navigate('/dashboard');
+    } else {
+      toast.message('Wallet not detected', {
+        description: `We opened the ${wallet === 'leather' ? 'Leather' : 'Xverse'} site in a new tab to install it. Come back here to connect after installing.`,
+      });
+    }
   };
 
   const Protected = ({ children }: { children: React.ReactNode }) =>

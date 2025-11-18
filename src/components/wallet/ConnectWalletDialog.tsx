@@ -6,7 +6,8 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Wallet } from 'lucide-react';
+import { Wallet, ExternalLink } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface ConnectWalletDialogProps {
   open: boolean;
@@ -15,6 +16,33 @@ interface ConnectWalletDialogProps {
 }
 
 const ConnectWalletDialog = ({ open, onOpenChange, onConnect }: ConnectWalletDialogProps) => {
+  const [hasLeather, setHasLeather] = useState(false);
+  const [hasXverse, setHasXverse] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    let timer: any;
+    let tries = 0;
+    const detect = () => {
+      const provider: any = (globalThis as any)?.StacksProvider;
+      const leather = !!(provider?.isHiroWallet || provider?.isLeather);
+      const xverse = !!(provider?.isXverse || provider?.name === 'Xverse');
+      setHasLeather(leather);
+      setHasXverse(xverse);
+      tries++;
+      if ((!leather || !xverse) && tries < 10) {
+        timer = setTimeout(detect, 300);
+      }
+    };
+    detect();
+    const ua = navigator.userAgent || navigator.vendor || (window as any)?.opera;
+    setIsMobile(/android|iphone|ipad|ipod/i.test(ua));
+    return () => clearTimeout(timer);
+  }, [open]);
+
+  const openLeatherSite = () => window.open('https://leather.io/', '_blank', 'noopener');
+  const openXverseSite = () => window.open('https://www.xverse.app/download', '_blank', 'noopener');
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
@@ -38,6 +66,14 @@ const ConnectWalletDialog = ({ open, onOpenChange, onConnect }: ConnectWalletDia
               <div className="text-xs text-muted-foreground">Connect with Leather</div>
             </div>
           </Button>
+          {!hasLeather && (
+            <div className="-mt-2 text-xs text-muted-foreground flex items-center justify-between">
+              <span>Leather not detected. After installing, refresh the page.</span>
+              <button onClick={openLeatherSite} className="inline-flex items-center gap-1 text-blue-600 hover:underline">
+                Get Leather <ExternalLink className="h-3 w-3" />
+              </button>
+            </div>
+          )}
           <Button
             onClick={() => onConnect('xverse')}
             variant="outline"
@@ -51,6 +87,23 @@ const ConnectWalletDialog = ({ open, onOpenChange, onConnect }: ConnectWalletDia
               <div className="text-xs text-muted-foreground">Connect with Xverse</div>
             </div>
           </Button>
+          {!hasXverse && (
+            <div className="-mt-2 text-xs text-muted-foreground flex items-center justify-between">
+              <span>Xverse not detected. After installing, refresh the page.</span>
+              <button onClick={openXverseSite} className="inline-flex items-center gap-1 text-blue-600 hover:underline">
+                Get Xverse <ExternalLink className="h-3 w-3" />
+              </button>
+            </div>
+          )}
+
+          {isMobile && (
+            <div className="mt-4 rounded-md border p-3 text-xs text-muted-foreground">
+              On mobile, use the Xverse app and open this site in the in-app browser to connect. If you don't have it yet,{' '}
+              <button onClick={openXverseSite} className="inline-flex items-center gap-1 text-blue-600 hover:underline">
+                get Xverse <ExternalLink className="h-3 w-3" />
+              </button>.
+            </div>
+          )}
         </div>
       </DialogContent>
     </Dialog>
