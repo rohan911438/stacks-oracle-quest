@@ -115,6 +115,48 @@ Once you're ready to deploy smart contracts, share your target chain and toolcha
 
 We’ll also add environment variables and secrets for keys securely via GitHub Environments.
 
+### Clarity Contracts (Stacks)
+
+This repo includes a minimal Clarity contract and a deploy script:
+
+- Contract: `contracts/oracle-market.clar`
+- Local deploy script: `npm run deploy:contract`
+- CI deploy workflow: `.github/workflows/deploy-contract.yml` (manual trigger)
+
+Setup for local deploy (Windows cmd):
+
+```cmd
+copy .env.contracts.example .env.contracts
+:: Edit .env.contracts and set DEPLOYER_PRIVATE_KEY (testnet key recommended)
+set STACKS_NETWORK=testnet
+npm run deploy:contract
+```
+
+Required env vars (local or CI):
+- `DEPLOYER_PRIVATE_KEY`: Deployer private key (use testnet while iterating)
+- `STACKS_NETWORK`: `testnet` or `mainnet` (default: `testnet`)
+- `STACKS_API_URL`: Optional Node API (defaults to Hiro public endpoints)
+- `CONTRACT_NAME` and `CONTRACT_PATH`: To select the contract file
+
+CI deploy (GitHub Actions):
+- Add repo secrets: `STACKS_PRIVATE_KEY` (and optionally `STACKS_API_URL`).
+- Run the workflow “Deploy Clarity Contract” via Actions → Run workflow.
+- Provide inputs (network, contract name/path). The job prints a Hiro Explorer link upon broadcast.
+
+Troubleshooting
+- Explorer Sandbox error “supports Clarity 3 only”: We deploy with Clarity 3 via the Node script. Prefer `npm run deploy:contract` or the GitHub Action.
+- Leather shows a blank white window:
+	- Allow pop-ups for localhost.
+	- Update Leather to latest and restart the browser.
+	- Try http://localhost:8080 (not file:// or a LAN IP).
+	- Disable aggressive blockers (Brave shields/Privacy extensions) for the site.
+	- Hard refresh (Ctrl+F5) after installing the wallet.
+
+Manual deploy via wallet (no keys in CI):
+- Open https://explorer.hiro.so/sandbox/deploy?chain=testnet
+- Paste the contract code from `contracts/oracle-market.clar`
+- Connect Leather/Xverse and deploy (testnet recommended first)
+
 ## Wallet Connection
 
 - Supported wallets: Leather and Xverse via `@stacks/connect`.
