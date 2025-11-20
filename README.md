@@ -1,177 +1,119 @@
-# Welcome to your Lovable project
+# OracleQuest: A Decentralized Prediction Market
 
-## Project info
+[![CI](https://github.com/rohan911438/stacks-oracle-quest/actions/workflows/ci.yml/badge.svg)](https://github.com/rohan911438/stacks-oracle-quest/actions/workflows/ci.yml)
+[![Deploy Pages](https://github.com/rohan911438/stacks-oracle-quest/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/rohan911438/stacks-oracle-quest/actions/workflows/deploy-pages.yml)
+[![Deploy Contract](https://github.com/rohan911438/stacks-oracle-quest/actions/workflows/deploy-contract.yml/badge.svg)](https://github.com/rohan911438/stacks-oracle-quest/actions/workflows/deploy-contract.yml)
 
-**URL**: https://lovable.dev/projects/9580911c-6bdf-41f0-94e1-c1f38caa2693
+OracleQuest is a full-stack decentralized application (dApp) that allows users to create and participate in prediction markets. It is built on the Stacks blockchain and features a React frontend, an Express.js backend for API and data aggregation, and a Clarity smart contract for on-chain logic.
 
-## How can I edit this code?
+- **Author**: Rohan Kumar
+- **GitHub**: [rohan911438](https://github.com/rohan911438)
 
-There are several ways of editing your application.
+## How It Works
 
-**Use Lovable**
+The application is composed of three main parts: a frontend for user interaction, a backend for serving data, and a Clarity smart contract for core logic and state.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/9580911c-6bdf-41f0-94e1-c1f38caa2693) and start prompting.
+### 1. Frontend (Vite + React + TypeScript)
 
-Changes made via Lovable will be committed automatically to this repo.
+The user-facing application is a modern single-page application (SPA) built with Vite, React, and TypeScript.
 
-**Use your preferred IDE**
+- **UI**: Built with `shadcn/ui` and `Tailwind CSS` for a responsive and modern design.
+- **Wallet Integration**: Connects to the Stacks blockchain using Leather and Xverse wallets via `@stacks/connect`. It gracefully handles cases where a wallet is not installed by guiding the user to the official download pages.
+- **State Management**: Uses `React Query` for server-state caching and `React Context` for global UI state like wallet connection status.
+- **Routing**: `React Router` handles all client-side navigation.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### 2. Backend (Express.js)
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+A lightweight Express.js server acts as an API gateway and mock data store.
 
-Follow these steps:
+- **API Routes**: Provides RESTful endpoints for fetching markets, user portfolios, and processing trades.
+- **Mock Data**: The `server/store.js` file simulates a database, allowing the frontend to function without a persistent backend. This can be replaced with a real database and on-chain data indexing.
+- **Local Development**: Runs concurrently with the Vite dev server for a seamless local development experience.
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+### 3. Smart Contract (Clarity)
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+The core logic resides in the `oracle-market.clar` smart contract on the Stacks blockchain.
 
-# Step 3: Install the necessary dependencies.
-npm i
+- **Market Management**: Allows users to create and resolve prediction markets. It includes functions like `create-market-auto` (with auto-incrementing IDs) and `resolve-market`.
+- **Admin Controls**: A contract owner (admin) can be set to manage critical functions. The `set-admin` function allows for secure initialization and rotation of the admin principal.
+- **Safety and Guards**: The contract includes checks to prevent common issues, such as resolving a market before its end time (`ERR-TOO-EARLY`) or unauthorized actions (`ERR-UNAUTHORIZED`).
+- **Versioning**: Includes a `CONTRACT-VERSION` constant for easy tracking of deployed versions.
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+## Technologies Used
 
-**Edit a file directly in GitHub**
+- **Frontend**: Vite, React, TypeScript, Tailwind CSS, shadcn/ui
+- **Backend**: Node.js, Express.js
+- **Blockchain**: Stacks
+- **Smart Contracts**: Clarity
+- **Wallet Integration**: `@stacks/connect` (Leather & Xverse)
+- **CI/CD**: GitHub Actions
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Getting Started
 
-**Use GitHub Codespaces**
+To run this project locally, you will need Node.js and npm installed.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+1.  **Clone the repository:**
+    ```cmd
+    git clone https://github.com/rohan911438/stacks-oracle-quest.git
+    cd stacks-oracle-quest
+    ```
 
-## What technologies are used for this project?
+2.  **Install dependencies:**
+    ```cmd
+    npm install
+    ```
 
-This project is built with:
+3.  **Set up local environment variables:**
+    - Copy `.env.example` to `.env` for frontend settings (e.g., `VITE_STACKS_NETWORK`).
+    - Copy `.env.contracts.example` to `.env.contracts` for contract deployment settings.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+4.  **Run the development servers:**
+    This command starts both the Vite frontend and the Express backend concurrently.
+    ```cmd
+    npm run dev
+    ```
+    The application will be available at `http://localhost:8080`.
 
-## How can I deploy this project?
+## Deployment
 
-Simply open [Lovable](https://lovable.dev/projects/9580911c-6bdf-41f0-94e1-c1f38caa2693) and click on Share -> Publish.
+This project is configured for automated deployments for both the frontend and the smart contract.
 
-## Can I connect a custom domain to my Lovable project?
+### Frontend (GitHub Pages)
 
-Yes, you can!
+The frontend is automatically deployed to GitHub Pages on every push to the `main` branch.
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+- **Workflow**: `.github/workflows/deploy-pages.yml`
+- **Configuration**: To enable, go to your repository's **Settings > Pages** and set the **Source** to **GitHub Actions**.
+- **API URL**: If your API is hosted separately, set a repository secret named `VITE_API_URL`. The frontend will use this URL in production builds.
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+### Smart Contract (Clarity)
 
-## CI/CD Workflows (GitHub Actions)
+The Clarity contract can be deployed manually via a GitHub Actions workflow.
 
-This repo includes end-to-end workflows to keep the app healthy and easy to ship:
+- **Workflow**: `.github/workflows/deploy-contract.yml`
+- **Prerequisites**:
+    1.  Create a repository secret named `STACKS_PRIVATE_KEY` containing the private key of the deployer account (use a testnet key for safety).
+    2.  Optionally, set `STACKS_API_URL` if you need to use a custom Stacks node.
+- **How to Deploy**:
+    1.  Go to the **Actions** tab in your GitHub repository.
+    2.  Select the **Deploy Clarity Contract** workflow.
+    3.  Click **Run workflow**, choose the network (`testnet` or `mainnet`), and confirm. The workflow will deploy the contract and output a link to the transaction in Hiro Explorer.
 
-- CI (`.github/workflows/ci.yml`): Runs on push/PR to `main`.
-	- Installs deps, lints, TypeScript typechecks, and builds.
-	- Uploads the production `dist` as a build artifact.
-- Pages Deploy (`.github/workflows/deploy-pages.yml`): Builds and deploys the frontend to GitHub Pages on push to `main`.
+## CI/CD Workflows
 
-### Configure Deployments
+The repository includes the following GitHub Actions workflows:
 
-- Enable Pages: Repo Settings → Pages → Build and deployment → GitHub Actions.
-- Optional backend URL: If your API is hosted separately, set a repo secret `VITE_API_URL` to the API origin (e.g. `https://oracle-quest-api.example.com`). The frontend will call `${VITE_API_URL}/api/...` when provided; otherwise it uses same-origin.
-- Local env: Copy `.env.example` to `.env` and set `VITE_API_URL` if needed.
-
-### Useful Commands
-
-```cmd
-:: Install dependencies
-npm i
-
-:: Run full dev (client + server)
-npm run dev
-
-:: Lint and typecheck locally
-npm run lint
-npm run typecheck
-
-:: Build production assets
-npm run build
-```
-
-## Next: Contract Deployment
-
-Once you're ready to deploy smart contracts, share your target chain and toolchain (e.g., Stacks/Clarity, EVM/Foundry/Hardhat). I can wire a dedicated workflow that:
-
-- Lints and tests the contracts.
-- Builds/artifacts and posts them as PR artifacts.
-- Automates testnet deploys on tag/PR.
-- Promotes to mainnet on a protected `release` workflow with manual approval.
-
-We’ll also add environment variables and secrets for keys securely via GitHub Environments.
-
-### Clarity Contracts (Stacks)
-
-This repo includes a minimal Clarity contract and a deploy script:
-
-- Contract: `contracts/oracle-market.clar`
-- Local deploy script: `npm run deploy:contract`
-- CI deploy workflow: `.github/workflows/deploy-contract.yml` (manual trigger)
-
-Setup for local deploy (Windows cmd):
-
-```cmd
-copy .env.contracts.example .env.contracts
-:: Edit .env.contracts and set DEPLOYER_PRIVATE_KEY (testnet key recommended)
-set STACKS_NETWORK=testnet
-npm run deploy:contract
-```
-
-Required env vars (local or CI):
-- `DEPLOYER_PRIVATE_KEY`: Deployer private key (use testnet while iterating)
-- `STACKS_NETWORK`: `testnet` or `mainnet` (default: `testnet`)
-- `STACKS_API_URL`: Optional Node API (defaults to Hiro public endpoints)
-- `CONTRACT_NAME` and `CONTRACT_PATH`: To select the contract file
-
-CI deploy (GitHub Actions):
-- Add repo secrets: `STACKS_PRIVATE_KEY` (and optionally `STACKS_API_URL`).
-- Run the workflow “Deploy Clarity Contract” via Actions → Run workflow.
-- Provide inputs (network, contract name/path). The job prints a Hiro Explorer link upon broadcast.
-
-Troubleshooting
-- Explorer Sandbox error “supports Clarity 3 only”: We deploy with Clarity 3 via the Node script. Prefer `npm run deploy:contract` or the GitHub Action.
-- Leather shows a blank white window:
-	- Allow pop-ups for localhost.
-	- Update Leather to latest and restart the browser.
-	- Try http://localhost:8080 (not file:// or a LAN IP).
-	- Disable aggressive blockers (Brave shields/Privacy extensions) for the site.
-	- Hard refresh (Ctrl+F5) after installing the wallet.
-
-Manual deploy via wallet (no keys in CI):
-- Open https://explorer.hiro.so/sandbox/deploy?chain=testnet
-- Paste the contract code from `contracts/oracle-market.clar`
-- Connect Leather/Xverse and deploy (testnet recommended first)
+-   **`ci.yml`**: Runs on every push and pull request to `main`. It installs dependencies, lints the code, runs TypeScript type checks, and builds the frontend to ensure code quality and correctness.
+-   **`deploy-pages.yml`**: Deploys the frontend to GitHub Pages.
+-   **`deploy-contract.yml`**: Deploys the Clarity smart contract.
 
 ## Wallet Connection
 
-- Supported wallets: Leather and Xverse via `@stacks/connect`.
-- If a wallet is not detected, the connect dialog shows install links:
-	- Leather: https://leather.io/
-	- Xverse: https://www.xverse.app/download
-- Mobile: Open this site in Xverse’s in-app browser for the smoothest connect experience.
-- Local network default: testnet. To switch:
+-   **Supported Wallets**: Leather and Xverse.
+-   **Detection**: The app detects if the chosen wallet is installed. If not, it provides a direct link to the official download page.
+-   **Mobile**: On mobile devices, users are advised to use the Xverse in-app browser for the best experience.
+-   **Network**: The default network for local development is `testnet`, configured in the `.env` file.
 
-```cmd
-:: Use testnet (default in .env)
-set VITE_STACKS_NETWORK=testnet
+## License
 
-:: Or switch to mainnet
-set VITE_STACKS_NETWORK=mainnet
-```
-
-If you deploy the API separately, set `VITE_API_URL` to the API origin. For GitHub Pages, the build already sets a base path for correct asset URLs.
+This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for details.
