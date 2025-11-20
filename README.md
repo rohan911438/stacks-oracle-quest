@@ -1,8 +1,5 @@
 # OracleQuest: A Decentralized Prediction Market
 
-[![CI](https://github.com/rohan911438/stacks-oracle-quest/actions/workflows/ci.yml/badge.svg)](https://github.com/rohan911438/stacks-oracle-quest/actions/workflows/ci.yml)
-[![Deploy Pages](https://github.com/rohan911438/stacks-oracle-quest/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/rohan911438/stacks-oracle-quest/actions/workflows/deploy-pages.yml)
-[![Deploy Contract](https://github.com/rohan911438/stacks-oracle-quest/actions/workflows/deploy-contract.yml/badge.svg)](https://github.com/rohan911438/stacks-oracle-quest/actions/workflows/deploy-contract.yml)
 
 OracleQuest is a full-stack decentralized application (dApp) that allows users to create and participate in prediction markets. It is built on the Stacks blockchain and features a React frontend, an Express.js backend for API and data aggregation, and a Clarity smart contract for on-chain logic.
 
