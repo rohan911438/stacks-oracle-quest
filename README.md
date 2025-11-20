@@ -6,6 +6,23 @@ OracleQuest is a full-stack decentralized application (dApp) that allows users t
 - **Author**: Rohan Kumar
 - **GitHub**: [rohan911438](https://github.com/rohan911438)
 
+## The Vision: Decentralizing Truth
+
+In a world saturated with information, access to verifiable truth is more critical than ever. Traditional prediction markets and information platforms are often centralized, leading to several key problems:
+
+-   **Censorship and Control**: A central authority can manipulate or shut down markets that don't align with its interests.
+-   **High Fees and Lack of Transparency**: Users are often subject to opaque fee structures and have no visibility into the platform's inner workings.
+-   **Custodial Risk**: Funds are held by the platform, creating a single point of failure and risk of loss.
+
+**OracleQuest** was built to solve these problems by leveraging the power of the Stacks blockchain. It provides a decentralized, permissionless, and transparent platform where anyone, anywhere can create and participate in prediction markets.
+
+By building on a decentralized foundation, OracleQuest ensures:
+-   **User Sovereignty**: You own your data and your funds. All interactions are peer-to-peer, mediated by a smart contract, not a corporation.
+-   **Transparency**: Every market, trade, and resolution is recorded on a public ledger, making the entire process auditable and fair.
+-   **Permissionless Access**: Anyone can create a market on any topic, fostering a true free market of ideas and predictions.
+
+Our mission is to create a global, accessible, and censorship-resistant ecosystem for forecasting future events, powered by the collective intelligence of its users.
+
 ## How It Works
 
 The application is composed of three main parts: a frontend for user interaction, a backend for serving data, and a Clarity smart contract for core logic and state.
