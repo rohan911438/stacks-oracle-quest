@@ -7,6 +7,9 @@ import {
   PostConditionMode,
   makeContractDeploy,
   callReadOnlyFunction,
+  createStacksPrivateKey,
+  getAddressFromPrivateKey,
+  TransactionVersion,
   // ClarityVersion is supported in newer stacks.js; falls back if unavailable
   // @ts-ignore
   ClarityVersion,
@@ -37,10 +40,18 @@ async function main() {
 
   const network = STACKS_NETWORK === 'mainnet' ? new StacksMainnet({ url: STACKS_API_URL }) : new StacksTestnet({ url: STACKS_API_URL });
 
+  // Validate the private key and get address
+  const privKey = createStacksPrivateKey(DEPLOYER_PRIVATE_KEY);
+  const senderAddress = getAddressFromPrivateKey(
+    DEPLOYER_PRIVATE_KEY, 
+    STACKS_NETWORK === 'mainnet' ? TransactionVersion.Mainnet : TransactionVersion.Testnet
+  );
+
   console.log(`Deploying contract`);
   console.log(`  name: ${CONTRACT_NAME}`);
   console.log(`  file: ${sourcePath}`);
   console.log(`  network: ${STACKS_NETWORK} (${STACKS_API_URL})`);
+  console.log(`  deployer: ${senderAddress}`);
 
   const tx = await makeContractDeploy({
     contractName: CONTRACT_NAME,
@@ -49,13 +60,27 @@ async function main() {
     network,
     anchorMode: AnchorMode.Any,
     postConditionMode: PostConditionMode.Deny,
+    fee: 10000, // Manual fee to avoid estimation issues
     // Prefer Clarity 3 where supported (Explorer Sandbox expects C3)
     // If the library doesn't support this yet, it will be ignored at runtime
     // @ts-ignore
     clarityVersion: (ClarityVersion && (ClarityVersion as any).Clarity3) || 3,
   });
 
-  const result = await broadcastTransaction(tx, network);
+  let result;
+  try {
+    result = await broadcastTransaction(tx, network);
+    console.log('Raw broadcast result:', result);
+  } catch (error) {
+    console.error('Broadcast error details:', error);
+    // Try alternative API endpoint
+    console.log('Trying alternative API...');
+    const altNetwork = STACKS_NETWORK === 'mainnet' 
+      ? new StacksMainnet({ url: 'https://stacks-node-api.mainnet.stacks.co' }) 
+      : new StacksTestnet({ url: 'https://stacks-node-api.testnet.stacks.co' });
+    result = await broadcastTransaction(tx, altNetwork);
+  }
+  
   // @ts-ignore - result may be string or object depending on version
   const txid: string = result.txid || result || '';
   if (!txid) {
